@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Access</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.API_BASE_URL = 'http://127.0.0.1:3000';
+  </script>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.png" alt="Site Logo" class="logo glitch">
+    <h1 class="classified-title">ACCOUNT ACCESS</h1>
+    <p class="classified-subtitle">Secure Your Archive Entry</p>
+    <nav class="archive-nav">
+      <a href="index.html">HOME</a>
+      <a href="files.html">FILES</a>
+      <a href="gallery.html">GALLERY</a>
+      <a href="shop.html">SHOP</a>
+      <a href="model.html">MODEL</a>
+      <a href="contact.html">CONTACT</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="content-box" style="max-width: 900px;">
+      <div id="authStatus" class="archive-note">Loading access state...</div>
+      <div id="authPanel" style="display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:16px;">
+        <div class="content-box">
+          <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Create Account</h3>
+          <form id="registerForm">
+            <label style="display:block; margin-bottom:8px;">Name<br><input type="text" name="name" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <label style="display:block; margin-bottom:8px;">Email<br><input type="email" name="email" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <label style="display:block; margin-bottom:8px;">Password<br><input type="password" name="password" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <label style="display:block; margin-bottom:12px;">Confirm Password<br><input type="password" name="confirmPassword" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <button type="submit" class="game-button">Register</button>
+          </form>
+          <div id="registerMessage" class="archive-note" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="content-box">
+          <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Sign In</h3>
+          <form id="loginForm">
+            <label style="display:block; margin-bottom:8px;">Email<br><input type="email" name="email" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <label style="display:block; margin-bottom:12px;">Password<br><input type="password" name="password" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <button type="submit" class="game-button">Login</button>
+          </form>
+          <div id="loginMessage" class="archive-note" style="margin-top:10px;"></div>
+          <p style="margin-top:10px;"><a href="reset-password.html">Forgot your password?</a></p>
+        </div>
+      </div>
+
+      <div id="memberPanel" style="display:none; margin-top:20px;">
+        <div class="content-box">
+          <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Signed In</h3>
+          <p id="memberGreeting"></p>
+          <form id="changePasswordForm" style="margin-top:12px;">
+            <label style="display:block; margin-bottom:8px;">Current Password<br><input type="password" name="currentPassword" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <label style="display:block; margin-bottom:8px;">New Password<br><input type="password" name="password" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <label style="display:block; margin-bottom:12px;">Confirm New Password<br><input type="password" name="confirmPassword" required style="width:100%; padding:8px; margin-top:4px;"></label>
+            <button type="submit" class="game-button">Change Password</button>
+          </form>
+          <div id="changePasswordMessage" class="archive-note" style="margin-top:10px;"></div>
+          <button id="logoutButton" class="game-button" style="margin-top:12px;">Logout</button>
+        </div>
+      </div>
+
+      <div id="adminPanel" style="display:none; margin-top:20px;">
+        <div class="content-box">
+          <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Admin Controls</h3>
+          <p>Remove users who violate site rules.</p>
+          <ul id="userList" style="padding-left:18px; color:#d8d8d8;"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Flat Earth Intelligence Archive — All Rights Reserved</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    const authStatus = document.getElementById('authStatus');
+    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.getElementById('loginForm');
+    const registerMessage = document.getElementById('registerMessage');
+    const loginMessage = document.getElementById('loginMessage');
+    const memberPanel = document.getElementById('memberPanel');
+    const adminPanel = document.getElementById('adminPanel');
+    const memberGreeting = document.getElementById('memberGreeting');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const changePasswordMessage = document.getElementById('changePasswordMessage');
+    const logoutButton = document.getElementById('logoutButton');
+    const userList = document.getElementById('userList');
+
+    const API_BASE_URL = window.API_BASE_URL || '/';
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(`${API_BASE_URL}${url.replace(/^\//, '')}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.message || 'Request failed.');
+      }
+      return payload;
+    }
+
+    async function loadSession() {
+      try {
+        const payload = await fetchJson('/api/me');
+        authStatus.textContent = `Signed in as ${payload.user.name} (${payload.user.role}).`;
+        memberPanel.style.display = 'block';
+        memberGreeting.textContent = `Welcome, ${payload.user.name}. You have cleared access.`;
+        if (payload.user.role === 'admin') {
+          adminPanel.style.display = 'block';
+          await loadUsers();
+        } else {
+          adminPanel.style.display = 'none';
+        }
+      } catch (error) {
+        authStatus.textContent = 'No active session. Create an account or sign in.';
+        memberPanel.style.display = 'none';
+        adminPanel.style.display = 'none';
+      }
+    }
+
+    async function loadUsers() {
+      const payload = await fetchJson('/api/users');
+      userList.innerHTML = '';
+      payload.users.forEach((user) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${user.name} (${user.email}) <button class="game-button" data-id="${user.id}" style="margin-left:8px; padding:6px 10px;">Remove</button>`;
+        userList.appendChild(li);
+      });
+      userList.querySelectorAll('button[data-id]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          try {
+            await fetchJson(`/api/users/${button.getAttribute('data-id')}`, { method: 'DELETE' });
+            await loadUsers();
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+      });
+    }
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      registerMessage.textContent = 'Creating account...';
+      try {
+        const formData = new FormData(registerForm);
+        const payload = await fetchJson('/api/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            confirmPassword: formData.get('confirmPassword')
+          })
+        });
+        registerMessage.textContent = payload.message;
+      } catch (error) {
+        registerMessage.textContent = error.message;
+      }
+    });
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      loginMessage.textContent = 'Signing in...';
+      try {
+        const formData = new FormData(loginForm);
+        const payload = await fetchJson('/api/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: formData.get('email'),
+            password: formData.get('password')
+          })
+        });
+        loginMessage.textContent = payload.message;
+        await loadSession();
+      } catch (error) {
+        loginMessage.textContent = error.message;
+      }
+    });
+
+    changePasswordForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      changePasswordMessage.textContent = 'Updating password...';
+      try {
+        const formData = new FormData(changePasswordForm);
+        const payload = await fetchJson('/api/change-password', {
+          method: 'POST',
+          body: JSON.stringify({
+            currentPassword: formData.get('currentPassword'),
+            password: formData.get('password'),
+            confirmPassword: formData.get('confirmPassword')
+          })
+        });
+        changePasswordMessage.textContent = payload.message;
+      } catch (error) {
+        changePasswordMessage.textContent = error.message;
+      }
+    });
+
+    logoutButton.addEventListener('click', async () => {
+      await fetchJson('/api/logout', { method: 'POST' });
+      authStatus.textContent = 'Signed out.';
+      memberPanel.style.display = 'none';
+      adminPanel.style.display = 'none';
+    });
+
+    loadSession();
+  </script>
+</body>
+</html>
