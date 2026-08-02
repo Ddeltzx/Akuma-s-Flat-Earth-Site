@@ -6,7 +6,7 @@
   <title>Account Access</title>
   <link rel="stylesheet" href="styles.css">
   <script>
-    window.API_BASE_URL = 'http://127.0.0.1:3000';
+    window.API_BASE_URL = 'https://flat-earth-private-db.onrender.com';
   </script>
 </head>
 <body>
@@ -99,16 +99,20 @@
     const API_BASE_URL = window.API_BASE_URL || '/';
 
     async function fetchJson(url, options = {}) {
-      const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${url}`, {
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        ...options
-      });
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload.message || 'Request failed.');
+      try {
+        const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${url}`, {
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          ...options
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.message || 'Request failed.');
+        }
+        return payload;
+      } catch (error) {
+        throw new Error(error.message || 'Unable to reach the account service. Please try again later.');
       }
-      return payload;
     }
 
     async function loadSession() {
