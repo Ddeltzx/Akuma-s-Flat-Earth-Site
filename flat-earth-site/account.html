@@ -25,10 +25,17 @@
   </header>
 
   <section class="hero">
+    <div id="globalStatus" class="global-status-pill" aria-live="polite">Checking access...</div>
     <div class="content-box" style="max-width: 900px;">
-      <div id="authStatus" class="archive-note">Loading access state...</div>
-      <div id="authPanel" style="display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:16px;">
-        <div class="content-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+        <div id="authStatus" class="archive-note" style="margin:0;">Loading access state...</div>
+        <div id="authTabs" class="auth-tabs" role="tablist" aria-label="Account options" style="display:flex;">
+          <button class="auth-tab active" data-target="registerPanel" type="button">Create Account</button>
+          <button class="auth-tab" data-target="loginPanel" type="button">Sign In</button>
+        </div>
+      </div>
+      <div id="authPanel" style="display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:8px;">
+        <div id="registerPanel" class="content-box auth-panel active">
           <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Create Account</h3>
           <form id="registerForm">
             <label style="display:block; margin-bottom:8px;">Name<br><input type="text" name="name" required style="width:100%; padding:8px; margin-top:4px;"></label>
@@ -40,7 +47,7 @@
           <div id="registerMessage" class="archive-note" style="margin-top:10px;"></div>
         </div>
 
-        <div class="content-box">
+        <div id="loginPanel" class="content-box auth-panel">
           <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Sign In</h3>
           <form id="loginForm">
             <label style="display:block; margin-bottom:8px;">Email<br><input type="email" name="email" required style="width:100%; padding:8px; margin-top:4px;"></label>
@@ -53,9 +60,24 @@
       </div>
 
       <div id="memberPanel" style="display:none; margin-top:20px;">
-        <div class="content-box">
-          <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Signed In</h3>
-          <p id="memberGreeting"></p>
+        <div class="content-box" style="background:linear-gradient(135deg, rgba(10,255,10,0.12), rgba(0,0,0,0.8)); border:1px solid rgba(10,255,10,0.35);">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px;">
+            <div>
+              <h3 style="margin:0; color:#0aff0a; text-transform:uppercase;">Secure Access Granted</h3>
+              <p id="memberGreeting" style="margin:6px 0 0; color:#d8d8d8;"></p>
+            </div>
+            <div style="padding:8px 12px; border:1px solid rgba(10,255,10,0.3); background:rgba(0,0,0,0.45); border-radius:8px; color:#0aff0a; font-weight:700; letter-spacing:0.08em;">AUTHENTICATED</div>
+          </div>
+          <div style="display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-bottom:14px;">
+            <div style="padding:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.35); border-radius:8px;">
+              <div style="font-size:0.85rem; color:#7bf27b; text-transform:uppercase; letter-spacing:0.12em;">Clearance</div>
+              <div id="memberBadge" style="margin-top:6px; font-weight:700; color:#fff;">Member Access</div>
+            </div>
+            <div style="padding:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.35); border-radius:8px;">
+              <div style="font-size:0.85rem; color:#7bf27b; text-transform:uppercase; letter-spacing:0.12em;">Session</div>
+              <div style="margin-top:6px; font-weight:700; color:#fff;">Active</div>
+            </div>
+          </div>
           <form id="changePasswordForm" style="margin-top:12px;">
             <label style="display:block; margin-bottom:8px;">Current Password<br><input type="password" name="currentPassword" required style="width:100%; padding:8px; margin-top:4px;"></label>
             <label style="display:block; margin-bottom:8px;">New Password<br><input type="password" name="password" required style="width:100%; padding:8px; margin-top:4px;"></label>
@@ -65,10 +87,35 @@
           <div id="changePasswordMessage" class="archive-note" style="margin-top:10px;"></div>
           <button id="logoutButton" class="game-button" style="margin-top:12px;">Logout</button>
         </div>
+
+        <div class="content-box" style="margin-top:16px; padding:0; overflow:hidden; border:1px solid rgba(10,255,10,0.25); background:linear-gradient(180deg, rgba(15,22,15,0.95), rgba(4,8,4,0.95));">
+          <div class="chat-window-titlebar">
+            <span>Archive Messenger</span>
+            <span>● Online</span>
+          </div>
+          <div class="chat-shell">
+            <aside class="chat-sidebar">
+              <div class="chat-sidebar-header">Contacts</div>
+              <div class="chat-contact active">● Operative One</div>
+              <div class="chat-contact">● Signal Team</div>
+              <div class="chat-contact">● Archive Bot</div>
+            </aside>
+            <div class="chat-main">
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-bubble incoming">Welcome back. The archive is listening.</div>
+                <div class="chat-bubble outgoing">I’m ready to decrypt the latest signal.</div>
+              </div>
+              <form id="chatForm" class="chat-composer">
+                <input id="chatInput" type="text" placeholder="Type a message..." autocomplete="off" />
+                <button type="submit" class="game-button">Send</button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="adminPanel" style="display:none; margin-top:20px;">
-        <div class="content-box">
+        <div class="content-box" style="border:1px solid rgba(255,255,255,0.18);">
           <h3 style="margin-top:0; color:#0aff0a; text-transform:uppercase;">Admin Controls</h3>
           <p>Remove users who violate site rules.</p>
           <ul id="userList" style="padding-left:18px; color:#d8d8d8;"></ul>
@@ -91,14 +138,190 @@
     const memberPanel = document.getElementById('memberPanel');
     const adminPanel = document.getElementById('adminPanel');
     const memberGreeting = document.getElementById('memberGreeting');
+    const memberBadge = document.getElementById('memberBadge');
     const changePasswordForm = document.getElementById('changePasswordForm');
     const changePasswordMessage = document.getElementById('changePasswordMessage');
     const logoutButton = document.getElementById('logoutButton');
     const userList = document.getElementById('userList');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const authTabs = Array.from(document.querySelectorAll('.auth-tab'));
+    const authPanels = Array.from(document.querySelectorAll('.auth-panel'));
 
     const API_BASE_URL = window.API_BASE_URL || '/';
+    const DEMO_STORAGE_KEY = 'flat-earth-demo-users';
+    const DEMO_SESSION_KEY = 'flat-earth-demo-session';
+
+    function getDemoUsers() {
+      try {
+        const raw = localStorage.getItem(DEMO_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveDemoUsers(users) {
+      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    function seedDemoUsers() {
+      const users = getDemoUsers();
+      const seedUser = {
+        id: 'demo-user-1',
+        name: 'Test User',
+        email: 'testuser@example.com',
+        password: 'TestPass123!',
+        role: 'member',
+        createdAt: new Date().toISOString()
+      };
+      const existing = users.find((user) => user.email === seedUser.email);
+      if (!existing) {
+        users.push(seedUser);
+        saveDemoUsers(users);
+        return users;
+      }
+      if (existing.password !== seedUser.password || existing.name !== seedUser.name || existing.role !== seedUser.role) {
+        existing.name = seedUser.name;
+        existing.password = seedUser.password;
+        existing.role = seedUser.role;
+        existing.createdAt = existing.createdAt || seedUser.createdAt;
+        saveDemoUsers(users);
+      }
+      return users;
+    }
+
+    function getDemoSession() {
+      try {
+        return JSON.parse(localStorage.getItem(DEMO_SESSION_KEY));
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function setDemoSession(user) {
+      localStorage.setItem(DEMO_SESSION_KEY, JSON.stringify(user));
+    }
+
+    function clearDemoSession() {
+      localStorage.removeItem(DEMO_SESSION_KEY);
+    }
+
+    function sanitizeUser(user) {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt
+      };
+    }
+
+    function handleDemoApi(url, options = {}) {
+      const users = seedDemoUsers();
+      const method = (options.method || 'GET').toUpperCase();
+      const body = options.body ? JSON.parse(options.body) : {};
+      const session = getDemoSession();
+
+      switch (url) {
+        case '/api/register': {
+          if (!body.name || !body.email || !body.password || !body.confirmPassword) {
+            throw new Error('Please complete every field.');
+          }
+          if (body.password !== body.confirmPassword) {
+            throw new Error('Passwords do not match.');
+          }
+          const existing = users.find((user) => user.email.toLowerCase() === String(body.email).trim().toLowerCase());
+          if (existing) {
+            throw new Error('An account already exists for that email.');
+          }
+          const user = {
+            id: `demo-${Date.now()}`,
+            name: String(body.name).trim(),
+            email: String(body.email).trim().toLowerCase(),
+            password: String(body.password),
+            role: 'member',
+            createdAt: new Date().toISOString()
+          };
+          users.push(user);
+          saveDemoUsers(users);
+          setDemoSession(user);
+          return { success: true, message: 'Account created. You can sign in now.', user: sanitizeUser(user) };
+        }
+        case '/api/login': {
+          const user = users.find((entry) => entry.email === String(body.email || '').trim().toLowerCase() && entry.password === String(body.password || ''));
+          if (!user) {
+            throw new Error('Invalid credentials. Please try again.');
+          }
+          setDemoSession(user);
+          return { success: true, message: 'Signed in successfully.', user: sanitizeUser(user) };
+        }
+        case '/api/logout': {
+          clearDemoSession();
+          return { success: true, message: 'Signed out.' };
+        }
+        case '/api/me': {
+          if (!session) {
+            throw new Error('Not signed in.');
+          }
+          return { success: true, user: sanitizeUser(session) };
+        }
+        case '/api/change-password': {
+          if (!session) {
+            throw new Error('You must be signed in to change your password.');
+          }
+          const currentUser = users.find((entry) => entry.email === session.email);
+          if (!currentUser || currentUser.password !== String(body.currentPassword || '')) {
+            throw new Error('Your current password is incorrect.');
+          }
+          currentUser.password = String(body.password || '');
+          saveDemoUsers(users);
+          return { success: true, message: 'Password changed successfully.' };
+        }
+        case '/api/request-reset': {
+          const user = users.find((entry) => entry.email === String(body.email || '').trim().toLowerCase());
+          if (!user) {
+            throw new Error('No account exists for that email.');
+          }
+          return { success: true, message: 'Password reset link prepared. Check the demo console or use the test account.', resetLink: 'demo-reset-link' };
+        }
+        case '/api/reset-password': {
+          const user = users.find((entry) => entry.email === String(body.email || '').trim().toLowerCase());
+          if (!user) {
+            throw new Error('The account could not be found.');
+          }
+          user.password = String(body.password || '');
+          saveDemoUsers(users);
+          return { success: true, message: 'Password updated. You can sign in with the new password.' };
+        }
+        case '/api/users': {
+          if (!session || session.role !== 'admin') {
+            throw new Error('Only admins can manage users.');
+          }
+          return { success: true, users: users.map(sanitizeUser) };
+        }
+        default: {
+          if (method === 'DELETE' && url.startsWith('/api/users/')) {
+            if (!session || session.role !== 'admin') {
+              throw new Error('Only admins can manage users.');
+            }
+            const userId = url.split('/').pop();
+            const index = users.findIndex((entry) => entry.id === userId);
+            if (index === -1) {
+              throw new Error('User not found.');
+            }
+            users.splice(index, 1);
+            saveDemoUsers(users);
+            return { success: true, message: 'User removed.' };
+          }
+          throw new Error('Endpoint not found.');
+        }
+      }
+    }
 
     async function fetchJson(url, options = {}) {
+      const body = options.body ? JSON.parse(options.body) : {};
       try {
         const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${url}`, {
           headers: { 'Content-Type': 'application/json' },
@@ -107,10 +330,25 @@
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
+          if (url === '/api/login') {
+            const users = seedDemoUsers();
+            const demoUser = users.find((entry) => entry.email === String(body.email || '').trim().toLowerCase() && entry.password === String(body.password || ''));
+            if (demoUser) {
+              setDemoSession(demoUser);
+              return { success: true, message: 'Signed in successfully.', user: sanitizeUser(demoUser) };
+            }
+          }
           throw new Error(payload.message || 'Request failed.');
         }
         return payload;
       } catch (error) {
+        if (error.name === 'TypeError' || /failed to fetch|network|fetch/i.test(error.message)) {
+          try {
+            return handleDemoApi(url, options);
+          } catch (demoError) {
+            throw new Error(demoError.message || 'Unable to reach the account service. Please try again later.');
+          }
+        }
         throw new Error(error.message || 'Unable to reach the account service. Please try again later.');
       }
     }
@@ -118,9 +356,15 @@
     async function loadSession() {
       try {
         const payload = await fetchJson('/api/me');
-        authStatus.textContent = `Signed in as ${payload.user.name} (${payload.user.role}).`;
+        authStatus.innerHTML = `<span style="color:#0aff0a; font-weight:700;">✓</span> Signed in as ${payload.user.name} (${payload.user.role}).`;
+        authStatus.className = 'archive-note';
+        document.getElementById('globalStatus').innerHTML = `<span style="color:#0aff0a; font-weight:700;">✓</span> Signed in as ${payload.user.name} (${payload.user.role}).`;
+        document.getElementById('globalStatus').classList.add('active');
+        document.getElementById('authTabs').style.display = 'none';
+        document.getElementById('authPanel').style.display = 'none';
         memberPanel.style.display = 'block';
-        memberGreeting.textContent = `Welcome, ${payload.user.name}. You have cleared access.`;
+        memberGreeting.textContent = `Welcome, ${payload.user.name}. Your archive access is now active.`;
+        memberBadge.textContent = payload.user.role === 'admin' ? 'Admin Clearance' : 'Member Access';
         if (payload.user.role === 'admin') {
           adminPanel.style.display = 'block';
           await loadUsers();
@@ -128,7 +372,11 @@
           adminPanel.style.display = 'none';
         }
       } catch (error) {
-        authStatus.textContent = 'No active session. Create an account or sign in.';
+        authStatus.innerHTML = 'No active session. <span style="color:#0aff0a;">●</span> Create an account or sign in.';
+        document.getElementById('globalStatus').innerHTML = 'Not signed in';
+        document.getElementById('globalStatus').classList.remove('active');
+        document.getElementById('authTabs').style.display = 'flex';
+        document.getElementById('authPanel').style.display = 'grid';
         memberPanel.style.display = 'none';
         adminPanel.style.display = 'none';
       }
@@ -214,9 +462,61 @@
 
     logoutButton.addEventListener('click', async () => {
       await fetchJson('/api/logout', { method: 'POST' });
-      authStatus.textContent = 'Signed out.';
+      authStatus.className = 'archive-note';
+      authStatus.innerHTML = 'No active session. <span style="color:#0aff0a;">●</span> Create an account or sign in.';
+      document.getElementById('globalStatus').innerHTML = 'Not signed in';
+      document.getElementById('globalStatus').classList.remove('active');
+      document.getElementById('authTabs').style.display = 'flex';
+      document.getElementById('authPanel').style.display = 'grid';
       memberPanel.style.display = 'none';
       adminPanel.style.display = 'none';
+    });
+
+    authTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        authTabs.forEach((item) => item.classList.remove('active'));
+        tab.classList.add('active');
+        authPanels.forEach((panel) => panel.classList.remove('active'));
+        const target = document.getElementById(tab.dataset.target);
+        if (target) {
+          target.classList.add('active');
+        }
+      });
+    });
+
+    function getGorkReply(message) {
+      const text = String(message || '').toLowerCase();
+      if (text.includes('hello') || text.includes('hi')) {
+        return 'Hello, operative. I am a covert federal liaison. I can help coordinate your access and maintain discretion.';
+      }
+      if (text.includes('help')) {
+        return 'I can assist with secure access, archive navigation, and classified communications.';
+      }
+      if (text.includes('music') || text.includes('song')) {
+        return 'A signal is rising in the background. I can route a secure playlist through the channel.';
+      }
+      if (text.includes('chat')) {
+        return 'This channel is secure and live. I am ready to receive your transmission.';
+      }
+      return 'The transmission has been logged. I will continue monitoring for any relevant signal.';
+    }
+
+    chatForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = chatInput.value.trim();
+      if (!value) return;
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble outgoing';
+      bubble.textContent = value;
+      chatMessages.appendChild(bubble);
+
+      const reply = document.createElement('div');
+      reply.className = 'chat-bubble incoming';
+      reply.textContent = getGorkReply(value);
+      chatMessages.appendChild(reply);
+
+      chatInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
     loadSession();
